@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>はむはむレース2026 投票所</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #FFD93D 0%, #FFA62E 50%, #FF6B9D 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #f0f0f0;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .social-share {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .social-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            border: none;
+        }
+
+        .social-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .social-button.twitter {
+            background-color: #000000;
+        }
+
+        .social-button.line {
+            background-color: #06C755;
+        }
+
+        .social-button.copy {
+            background-color: #6c757d;
+        }
+
+        .social-icon {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .video-intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .video-link {
+            display: inline-block;
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #FF4444 0%, #FF8888 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .video-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 68, 68, 0.4);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .race-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .race-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .race-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .race-card.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .race-card.disabled:hover {
+            transform: none;
+        }
+
+        .race-image-container {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio (1080/1920 = 0.5625) */
+            position: relative;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .race-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .race-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .race-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FF6B9D;
+            margin-bottom: 10px;
+        }
+
+        .vote-status {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .coming-soon {
+            font-style: italic;
+            color: #999;
+        }
+
+        .final-race {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .race-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .section-title {
+                font-size: 1.4em;
+            }
+        }
+
+        .youtube-section {
+            text-align: center;
+            margin-top: 60px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .youtube-link {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #FF0000 0%, #FF6B6B 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .youtube-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(255, 0, 0, 0.4);
+            background: linear-gradient(135deg, #CC0000 0%, #FF5555 100%);
+        }
+
+        .youtube-text {
+            color: white;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐹 はむはむレース2026 投票所 🐹</h1>
+        <p class="subtitle">各レースの1位を予想して投票しよう！</p>
+        
+        <div class="social-share">
+            <a href="https://twitter.com/intent/tweet?text=はむはむレース2026%20投票所&url=" target="_blank" class="social-button twitter">
+                <span class="social-icon">𝕏</span>
+            </a>
+            <a href="https://social-plugins.line.me/lineit/share?url=" target="_blank" class="social-button line">
+                <svg class="social-icon" viewBox="0 0 24 24" width="28" height="28" fill="white">
+                    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                </svg>
+            </a>
+            <button onclick="copyURL()" class="social-button copy">
+                <svg class="social-icon" viewBox="0 0 24 24" width="24" height="24" fill="white">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">予選レース</h2>
+            <div class="video-intro">
+                <a href="https://youtu.be/9aDUGKg-lNM" target="_blank" class="video-link">
+                    🎬 出場選手紹介
+                </a>
+            </div>
+            <div class="race-grid">
+                <!-- 予選第1レース -->
+                <a href="https://tasuketsu.com/vote/XQrKcvUSVGTkpnoqLSVF" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race1.png" alt="予選第1レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第1レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第2レース -->
+                <a href="https://tasuketsu.com/vote/HIN5HIEPsUhQcJYTNPyH" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race2.png" alt="予選第2レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第2レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第3レース -->
+                <a href="https://tasuketsu.com/vote/QdjRy6wsqTEG1YsWKt5u" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race3.png" alt="予選第3レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第3レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第4レース -->
+                <a href="https://tasuketsu.com/vote/Fx7Da4Qk6X54vUu7XhJ6" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race4.png" alt="予選第4レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第4レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第5レース -->
+                <a href="https://tasuketsu.com/vote/l4MN8mkCQJWSjrbpfFV0" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race5.png" alt="予選第5レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第5レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第6レース -->
+                <a href="https://tasuketsu.com/vote/vB1rprMCEokIKkz41DSz" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race6.png" alt="予選第6レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第6レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+
+                <!-- 予選第7レース -->
+                <a href="https://tasuketsu.com/vote/z4wRBvAzpVpAZMdTzIle" target="_blank" class="race-card">
+                    <div class="race-image-container">
+                        <img src="race7.png" alt="予選第7レース" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">予選第7レース</div>
+                        <div class="vote-status">クリックして投票！</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">決勝戦</h2>
+            <div class="race-grid final-race">
+                <div class="race-card disabled">
+                    <div class="race-image-container">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3Crect width='1920' height='1080' fill='%23e0e0e0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='120' fill='%23999'%3E？%3C/text%3E%3C/svg%3E" alt="決勝戦" class="race-image">
+                    </div>
+                    <div class="race-info">
+                        <div class="race-number">決勝戦</div>
+                        <div class="vote-status coming-soon">予選終了後に投票開始</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="youtube-section">
+            <div class="youtube-text">🎬 もっとかわいいはむスターたちを見る！</div>
+            <a href="https://youtube.com/@hamuchira?si=AlyDUR8Q5bfyDcVH" target="_blank" class="youtube-link">
+                📺 もっと！はむチラ長屋ch.
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function copyURL() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URLをコピーしました！');
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
+            });
+        }
+    </script>
+</body>
+</html>
