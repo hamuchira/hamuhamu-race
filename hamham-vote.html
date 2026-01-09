@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>はむはむレース2026 投票ツール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #FFD93D 0%, #FF8080 50%, #FF6B9D 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF6B9D;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .race-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .race-tab {
+            padding: 12px 24px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .race-tab:hover {
+            background: #FFD93D;
+            transform: translateY(-2px);
+        }
+
+        .race-tab.active {
+            background: linear-gradient(135deg, #FF8080, #FF6B9D);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .race-content {
+            display: none;
+        }
+
+        .race-content.active {
+            display: block;
+        }
+
+        .voting-section {
+            margin-bottom: 40px;
+        }
+
+        .voting-section h2 {
+            color: #FF6B9D;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .hamsters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hamster-btn {
+            padding: 20px;
+            background: linear-gradient(135deg, #FFD93D, #FFA500);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hamster-btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .hamster-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .voted-message {
+            display: none;
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .voted-message.show {
+            display: block;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-section h3 {
+            color: #FF6B9D;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table th {
+            background: linear-gradient(135deg, #FF8080, #FF6B9D);
+            color: white;
+            font-weight: bold;
+        }
+
+        .results-table tr:hover {
+            background: #fff3e0;
+        }
+
+        .percentage {
+            font-weight: bold;
+            color: #FF6B9D;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .race-tab {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            .hamsters-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #FFD93D;
+            color: #666;
+        }
+
+        .youtube-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #FF0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .youtube-link:hover {
+            background: #CC0000;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐹 はむはむレース2026 🐹</h1>
+        <p class="subtitle">あなたの推しハムに投票しよう！</p>
+
+        <div class="race-tabs" id="raceTabs"></div>
+
+        <div id="raceContents"></div>
+
+        <div class="footer">
+            <p>© 2026 はむはむレース2026</p>
+            <a href="https://www.youtube.com/@hamuchira-nagaya" class="youtube-link" target="_blank">
+                📺 もっと！はむチラ長屋ch.
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyBiRr2YLEn-EBu_S8nxn-jpZ2lLpmy7Mhk",
+            authDomain: "hamham-race-2026.firebaseapp.com",
+            projectId: "hamham-race-2026",
+            storageBucket: "hamham-race-2026.firebasestorage.app",
+            messagingSenderId: "1005694982604",
+            appId: "1:1005694982604:web:ead24255082635f9c4a569"
+        };
+
+        // Firebaseを初期化
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // グローバルに公開
+        window.db = db;
+        window.firestoreFunctions = { doc, setDoc, getDoc, updateDoc, onSnapshot, increment };
+    </script>
+
+    <script>
+        // レースデータ
+        const races = [
+            {
+                id: 1,
+                name: '第1レース',
+                hamsters: ['ホワイトモカ', 'ぷらりね', 'コンパナ', 'かるめら']
+            },
+            {
+                id: 2,
+                name: '第2レース',
+                hamsters: ['フレジェ', 'ガナッシュ', 'ブラウニー', 'ファッジ', 'トフィー']
+            },
+            {
+                id: 3,
+                name: '第3レース',
+                hamsters: ['アマレッティ', 'リコッタ', 'ぴちる', 'とうふぁ', 'ビスコッティ']
+            },
+            {
+                id: 4,
+                name: '第4レース',
+                hamsters: ['ブルトンヌ', 'ぱんな', 'トリュフ', 'ことん', 'ぱいこ']
+            },
+            {
+                id: 5,
+                name: '第5レース',
+                hamsters: ['こった', 'ねむりーの', 'ダークモカ', 'ぺこりーの', 'まふぃん']
+            },
+            {
+                id: 6,
+                name: '第6レース',
+                hamsters: ['まかだみあ', 'ぱん子', 'ぱんけーき', 'くるみ', 'フォレ']
+            },
+            {
+                id: 7,
+                name: '第7レース',
+                hamsters: ['アーモンド', 'ぽわれ', 'そわれ', 'カシュー', 'ブラお']
+            }
+        ];
+
+        // グラフの色
+        const colors = [
+            '#FF6B9D', '#FFD93D', '#FF8080', '#FFA500', '#FF69B4',
+            '#FFB6C1', '#FFA07A', '#FF7F50', '#FFE4B5', '#FFDAB9'
+        ];
+
+        let charts = {};
+        let currentRace = 1;
+        let listeners = {};
+
+        // 初期化
+        function init() {
+            createTabs();
+            createRaceContents();
+            initializeFirestore();
+            switchRace(1);
+        }
+
+        // Firestoreを初期化
+        async function initializeFirestore() {
+            const { doc, setDoc, getDoc } = window.firestoreFunctions;
+            
+            // 各レースのドキュメントを初期化
+            for (let race of races) {
+                const raceRef = doc(window.db, 'votes', `race-${race.id}`);
+                const raceDoc = await getDoc(raceRef);
+                
+                if (!raceDoc.exists()) {
+                    // ドキュメントが存在しない場合は作成
+                    const initialVotes = {};
+                    race.hamsters.forEach(hamster => {
+                        initialVotes[hamster] = 0;
+                    });
+                    
+                    await setDoc(raceRef, {
+                        votes: initialVotes,
+                        totalVotes: 0
+                    });
+                }
+                
+                // リアルタイムリスナーを設定
+                setupRealtimeListener(race.id);
+            }
+        }
+
+        // リアルタイムリスナーを設定
+        function setupRealtimeListener(raceId) {
+            const { doc, onSnapshot } = window.firestoreFunctions;
+            const raceRef = doc(window.db, 'votes', `race-${raceId}`);
+            
+            // 既存のリスナーを解除
+            if (listeners[raceId]) {
+                listeners[raceId]();
+            }
+            
+            // 新しいリスナーを設定
+            listeners[raceId] = onSnapshot(raceRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    updateResultsFromFirestore(raceId, docSnap.data());
+                }
+            });
+        }
+
+        // タブ作成
+        function createTabs() {
+            const tabsContainer = document.getElementById('raceTabs');
+            races.forEach(race => {
+                const tab = document.createElement('button');
+                tab.className = 'race-tab';
+                tab.textContent = race.name;
+                tab.onclick = () => switchRace(race.id);
+                tab.id = `tab-${race.id}`;
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // レースコンテンツ作成
+        function createRaceContents() {
+            const contentsContainer = document.getElementById('raceContents');
+            races.forEach(race => {
+                const content = document.createElement('div');
+                content.className = 'race-content';
+                content.id = `race-${race.id}`;
+                
+                content.innerHTML = `
+                    <div class="voting-section">
+                        <h2>${race.name}</h2>
+                        <div class="voted-message" id="voted-${race.id}">
+                            このレースには既に投票済みです！
+                        </div>
+                        <div class="hamsters-grid" id="grid-${race.id}">
+                            ${race.hamsters.map(hamster => `
+                                <button class="hamster-btn" onclick="vote(${race.id}, '${hamster}')">
+                                    ${hamster}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="results-section" id="results-${race.id}">
+                        <h3>📊 投票結果</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-${race.id}"></canvas>
+                        </div>
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>ハムスター名</th>
+                                    <th>得票数</th>
+                                    <th>割合</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-${race.id}">
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                contentsContainer.appendChild(content);
+            });
+        }
+
+        // レース切り替え
+        function switchRace(raceId) {
+            currentRace = raceId;
+            
+            // タブのアクティブ状態
+            document.querySelectorAll('.race-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${raceId}`).classList.add('active');
+            
+            // コンテンツの表示切り替え
+            document.querySelectorAll('.race-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`race-${raceId}`).classList.add('active');
+            
+            // 投票状態をチェック
+            checkVoteStatus(raceId);
+            
+            // Firestoreのリスナーが自動的に結果を更新
+        }
+
+        // 投票状態チェック
+        function checkVoteStatus(raceId) {
+            const voted = localStorage.getItem(`voted-race-${raceId}`);
+            const votedMessage = document.getElementById(`voted-${raceId}`);
+            const buttons = document.querySelectorAll(`#grid-${raceId} .hamster-btn`);
+            
+            if (voted) {
+                votedMessage.classList.add('show');
+                buttons.forEach(btn => btn.disabled = true);
+            }
+        }
+
+        // 投票処理
+        async function vote(raceId, hamster) {
+            // 既に投票済みかチェック
+            if (localStorage.getItem(`voted-race-${raceId}`)) {
+                alert('このレースには既に投票済みです！');
+                return;
+            }
+            
+            try {
+                const { doc, updateDoc, increment } = window.firestoreFunctions;
+                const raceRef = doc(window.db, 'votes', `race-${raceId}`);
+                
+                // Firestoreで投票数を更新
+                await updateDoc(raceRef, {
+                    [`votes.${hamster}`]: increment(1),
+                    totalVotes: increment(1)
+                });
+                
+                // ローカルストレージに投票済みを記録
+                localStorage.setItem(`voted-race-${raceId}`, 'true');
+                
+                // UI更新
+                checkVoteStatus(raceId);
+                
+                // 結果セクションを表示
+                document.getElementById(`results-${raceId}`).classList.add('show');
+                
+                alert(`${hamster}に投票しました！ありがとうございます🐹`);
+            } catch (error) {
+                console.error('投票エラー:', error);
+                alert('投票に失敗しました。もう一度お試しください。');
+            }
+        }
+
+        // Firestoreからの結果を更新
+        function updateResultsFromFirestore(raceId, data) {
+            const race = races.find(r => r.id === raceId);
+            if (!data || !data.votes) return;
+            
+            const votes = data.votes;
+            const totalVotes = data.totalVotes || 0;
+            
+            // 投票がない場合は表示しない
+            if (totalVotes === 0) {
+                document.getElementById(`results-${raceId}`).classList.remove('show');
+                return;
+            }
+            
+            // 結果セクションを表示
+            document.getElementById(`results-${raceId}`).classList.add('show');
+            
+            // データ準備
+            const data_array = race.hamsters.map(hamster => votes[hamster] || 0);
+            const labels = race.hamsters;
+            
+            // グラフ更新
+            updateChart(raceId, labels, data_array);
+            
+            // テーブル更新
+            updateTable(raceId, labels, data_array, totalVotes);
+        }
+
+        // 結果更新（互換性のため残す）
+        function updateResults(raceId) {
+            // Firestoreのリアルタイムリスナーが処理するため、この関数は不要
+            // ただし既存のコードとの互換性のため残しておく
+        }
+
+        // グラフ更新
+        function updateChart(raceId, labels, data) {
+            const ctx = document.getElementById(`chart-${raceId}`).getContext('2d');
+            
+            // 既存のグラフを破棄
+            if (charts[raceId]) {
+                charts[raceId].destroy();
+            }
+            
+            // 新しいグラフを作成
+            charts[raceId] = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value}票 (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // テーブル更新
+        function updateTable(raceId, labels, data, totalVotes) {
+            const tbody = document.getElementById(`table-${raceId}`);
+            tbody.innerHTML = '';
+            
+            // データをソート（得票数の多い順）
+            const sorted = labels.map((label, i) => ({
+                name: label,
+                votes: data[i],
+                percentage: totalVotes > 0 ? ((data[i] / totalVotes) * 100).toFixed(1) : 0
+            })).sort((a, b) => b.votes - a.votes);
+            
+            // テーブル行を作成
+            sorted.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.votes}票</td>
+                    <td class="percentage">${item.percentage}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ページ読み込み時に初期化
+        window.onload = init;
+    </script>
+</body>
+</html>
